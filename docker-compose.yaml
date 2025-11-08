@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    container_name: captcha_solver
+    command: uvicorn main:app --reload --port=9321 --host=0.0.0.0
+    env_file:
+      - .env
+    ports:
+      - 9321:9321
+    volumes:
+      - .:/app

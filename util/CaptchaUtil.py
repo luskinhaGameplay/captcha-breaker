@@ -3,6 +3,16 @@ import numpy as np
 from PIL import Image
 from skimage import exposure
 import base64
+from datetime import datetime
+
+masks = []
+
+
+masks.append(cv2.imread("/app/mascaras/mask-wave-default.png"))
+masks.append(cv2.imread("/app/mascaras/mask-point-default.png")) 
+masks.append(cv2.imread("/app/mascaras/mask-fish-eye-default-01.png"))
+masks.append(cv2.imread("/app/mascaras/mask-fish-eye-default-02.png"))
+
 
 def get_bounding_box(img):
 
@@ -77,6 +87,9 @@ def decodificar_imagen_base_64(base64EncodedFile):
 
   imagem_decodificada = cv2.imdecode(np_data,cv2.IMREAD_UNCHANGED)
 
+  nome_arquivo = f"original_saida_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.png"
+  cv2.imwrite(nome_arquivo, imagem_decodificada)
+
   return imagem_decodificada
 
 
@@ -88,16 +101,13 @@ def pre_process_image(base64EncodedFile):
    return image_mask
 
 
-def is_same_type (img_padrao,img_teste):
-    
+def get_image_type (img_teste):
     
     img_teste = cv2.cvtColor(img_teste, cv2.COLOR_GRAY2BGR)
-    
-    res = cv2.matchTemplate(img_padrao, img_teste, cv2.TM_CCOEFF_NORMED)
-    similaridade = cv2.minMaxLoc(res)[1]
+    similarity = []
 
-  
-    if similaridade > 0.12:
-        return True
-    else:
-        return False
+    for i in range(len(masks)) :
+       res = cv2.matchTemplate(masks[i], img_teste, cv2.TM_CCOEFF_NORMED)
+       similarity.append(cv2.minMaxLoc(res)[1]) 
+    
+    return similarity.index(max(similarity))

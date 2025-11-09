@@ -3,6 +3,7 @@ import pytesseract
 import numpy as np
 from skimage import exposure
 import util.CaptchaUtil as util
+from datetime import datetime
 
 tesseract_parameters = r'--psm 8 --oem 3 -c  tessedit_char_whitelist=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 
@@ -10,10 +11,6 @@ tesseract_parameters = r'--psm 8 --oem 3 -c  tessedit_char_whitelist=abcdefghijk
 kernel_2x2 = np.ones((2, 2), np.uint8)
 kernel_3x3= np.ones((3, 3), np.uint8)
 
-mask_potilhada = cv2.imread("/app/mascaras/mask-point-default.png")
-mask_wave = cv2.imread("/app/mascaras/mask-wave-default.png")
-mask_fish_eye_v1 = cv2.imread("/app/mascaras/mask-fish-eye-default-01.png")
-mask_fish_eye_v2 = cv2.imread("/app/mascaras/mask-fish-eye-default-02.png")
 
 
 def breakCaptcha (base64EncodedFile):
@@ -21,14 +18,19 @@ def breakCaptcha (base64EncodedFile):
   
    image_mask = util.pre_process_image(base64EncodedFile)
 
-   if(util.is_same_type(mask_wave,image_mask)):
-    return quebrarCaptchaWave(image_mask)
-   if(util.is_same_type(mask_potilhada,image_mask)):
+   image_type = util.get_image_type(image_mask)
+
+   if(image_type == 0):
+      print("wave type")
+      return quebrarCaptchaWave(image_mask)
+   if(image_type == 1):
+      print("point type")
       return quebrarCaptchaPontilhado(image_mask)
-   if((util.is_same_type(mask_fish_eye_v1,image_mask)) or (util.is_same_type(mask_fish_eye_v2,image_mask))):
+   if(image_type == 2 or image_type == 3):
+      print("fish type")
       return quebrarCaptchaFishEye(image_mask) 
    
-   return "Tipo não identificado"
+   return "Waved - point"
    
 
 
@@ -49,6 +51,9 @@ def quebrarCaptchaPontilhado(image_mask):
   
     # aplica BLUR
     average = cv2.blur(zoomed, (5, 5))
+
+    nome_arquivo = f"pontilhado_saida_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.png"
+    cv2.imwrite(nome_arquivo, average)
 
     captcha_code = pytesseract.image_to_string(average, config=tesseract_parameters)
 
@@ -74,6 +79,9 @@ def quebrarCaptchaWave(image_mask):
   
     # aplica BLUR
     bilateral_blur = cv2.bilateralFilter(zoomed, 9, 75, 75)
+
+    nome_arquivo = f"wave_saida_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.png"
+    cv2.imwrite(nome_arquivo, bilateral_blur)
 
     captcha_code = pytesseract.image_to_string(bilateral_blur, config=tesseract_parameters)
 

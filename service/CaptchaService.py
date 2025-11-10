@@ -52,8 +52,8 @@ def quebrarCaptchaPontilhado(image_mask):
     # aplica BLUR
     average = cv2.blur(zoomed, (5, 5))
 
-    nome_arquivo = f"pontilhado_saida_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.png"
-    cv2.imwrite(nome_arquivo, average)
+    #nome_arquivo = f"pontilhado_saida_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.png"
+    #cv2.imwrite(nome_arquivo, average)
 
     captcha_code = pytesseract.image_to_string(average, config=tesseract_parameters)
 
@@ -80,8 +80,8 @@ def quebrarCaptchaWave(image_mask):
     # aplica BLUR
     bilateral_blur = cv2.bilateralFilter(zoomed, 9, 75, 75)
 
-    nome_arquivo = f"wave_saida_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.png"
-    cv2.imwrite(nome_arquivo, bilateral_blur)
+    #nome_arquivo = f"wave_saida_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.png"
+    #cv2.imwrite(nome_arquivo, bilateral_blur)
 
     captcha_code = pytesseract.image_to_string(bilateral_blur, config=tesseract_parameters)
 

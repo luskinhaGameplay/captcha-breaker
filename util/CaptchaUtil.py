@@ -87,10 +87,13 @@ def decodificar_imagen_base_64(base64EncodedFile):
 
   imagem_decodificada = cv2.imdecode(np_data,cv2.IMREAD_UNCHANGED)
 
-  nome_arquivo = f"original_saida_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.png"
-  cv2.imwrite(nome_arquivo, imagem_decodificada)
+  zoomed = cv2.resize(imagem_decodificada, (202, 94), interpolation=cv2.INTER_LINEAR)
 
-  return imagem_decodificada
+
+  #nome_arquivo = f"original_saida_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.png"
+  #cv2.imwrite(nome_arquivo, imagem_decodificada)
+
+  return zoomed
 
 
 def pre_process_image(base64EncodedFile):
